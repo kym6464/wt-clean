@@ -1,6 +1,6 @@
 # wt-clean
 
-A [worktrunk](https://github.com/max-sixty/worktrunk) custom subcommand (`wt clean`) that cleans up every repo under `~/repos` at once: `git fetch` each repo, then run `wt step prune --min-age 1d` in each. That removes every worktree and local branch merged into its default branch, skipping worktrees created less than a day ago (they look merged until work starts on them).
+A [worktrunk](https://github.com/max-sixty/worktrunk) [custom subcommand](https://worktrunk.dev/extending/#custom-subcommands) (`wt clean`) that cleans up every repo under `~/repos` at once: `git fetch` each repo, then run `wt step prune --min-age 1d` in each. That removes every worktree and local branch merged into its default branch, skipping worktrees created less than a day ago (they look merged until work starts on them).
 
 ## Install
 
