@@ -1,0 +1,53 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Version bump
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+jobs:
+  release:
+    runs-on: macos-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v6
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - run: bun run typecheck
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Bump version
+        id: bump
+        run: |
+          npm version ${{ inputs.bump }} -m "v%s"
+          echo "tag=v$(node -p 'require("./package.json").version')" >> "$GITHUB_OUTPUT"
+          echo "version=$(node -p 'require("./package.json").version')" >> "$GITHUB_OUTPUT"
+
+      - name: Push
+        run: git push --follow-tags
+
+      - name: Build
+        run: |
+          bun run build
+          tar czf "dist/wt-clean-${{ steps.bump.outputs.version }}-darwin-arm64.tar.gz" -C dist wt-clean
+
+      - name: Create release
+        env:
+          # GITHUB_TOKEN events don't trigger other workflows; use a PAT so the
+          # release event triggers publish-homebrew.yml.
+          GH_TOKEN: ${{ secrets.HOMEBREW_PAT }}
+          GH_REPO: ${{ github.repository }}
+        run: gh release create "${{ steps.bump.outputs.tag }}" dist/*.tar.gz --title "${{ steps.bump.outputs.tag }}" --generate-notes
