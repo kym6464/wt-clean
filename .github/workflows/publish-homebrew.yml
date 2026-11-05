@@ -18,8 +18,10 @@ jobs:
           github_token: ${{ secrets.HOMEBREW_PAT }}
           version: ${{ github.event.release.tag_name }}
           install: 'bin.install "wt-clean"'
+          depends_on: |-
+            "worktrunk"
           target_darwin_arm64: true
-          # launchd runs a missed 10am tick on wake; if the Mac was off, it waits for the next day.
+          # Runs at login and daily at 10am; launchd runs a missed 10am tick on wake.
           formula_includes: |
             service do
               run opt_bin/"wt-clean"

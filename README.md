@@ -6,10 +6,10 @@ A [worktrunk](https://github.com/max-sixty/worktrunk) custom subcommand (`wt cle
 
 ```sh
 brew install kym6464/tap/wt-clean
-brew services start wt-clean  # run daily at 10am
+brew services start wt-clean  # run now, at login, and daily at 10am
 ```
 
-The service runs on wake if the Mac was asleep at 10am, and skips the day if it was off. Output goes to `$(brew --prefix)/var/log/wt-clean.log`.
+If the Mac was asleep at 10am, the run happens on wake; if it was off, the login run covers it. Output goes to `$(brew --prefix)/var/log/wt-clean.log`.
 
 To keep a worktree regardless of its merge state, run `git worktree lock <path>`.
 
