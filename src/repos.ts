@@ -1,19 +1,17 @@
 import { readdir, realpath, stat } from 'node:fs/promises';
-import { homedir } from 'node:os';
 import { join } from 'node:path';
 
-/** Main worktrees under ~/repos (symlinked entries excluded to avoid double-counting). */
-export async function findGitRepos(): Promise<string[]> {
-  const reposDir = join(homedir(), 'repos');
-  const dirents = await readdir(reposDir, { withFileTypes: true });
-  const repoNames = dirents.filter((d) => d.isDirectory()).map((d) => d.name);
-
+/** Main worktrees directly under `dirs` (symlinked entries excluded to avoid double-counting). */
+export async function findGitRepos(dirs: string[]): Promise<string[]> {
   const repos: string[] = [];
-  for (const name of repoNames) {
-    const repoPath = join(reposDir, name);
-    if (await isSymlinkedRepo(repoPath)) continue;
-    if (!(await stat(join(repoPath, '.git')).catch(() => null))) continue;
-    repos.push(repoPath);
+  for (const dir of await Promise.all(dirs.map((d) => realpath(d)))) {
+    const dirents = await readdir(dir, { withFileTypes: true });
+    for (const dirent of dirents.filter((d) => d.isDirectory())) {
+      const repoPath = join(dir, dirent.name);
+      if (await isSymlinkedRepo(repoPath)) continue;
+      if (!(await stat(join(repoPath, '.git')).catch(() => null))) continue;
+      repos.push(repoPath);
+    }
   }
   return repos;
 }

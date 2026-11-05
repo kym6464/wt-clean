@@ -26,6 +26,7 @@ jobs:
             service do
               run opt_bin/"wt-clean"
               run_type :cron
+              process_type :background
               cron "0 10 * * *"
               environment_variables PATH: std_service_path_env
               log_path var/"log/wt-clean.log"
