@@ -1,6 +1,6 @@
 {
   "name": "wt-clean",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "private": true,
   "description": "Worktrunk custom subcommand that removes merged worktrees and branches across all repos",
   "type": "module",
