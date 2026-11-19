@@ -1,6 +1,11 @@
 # wt-clean
 
-A [worktrunk](https://github.com/max-sixty/worktrunk) [custom subcommand](https://worktrunk.dev/extending/#custom-subcommands) (`wt clean`) that cleans up every repo under `~/repos` at once: `git fetch` each repo, then remove every clean worktree merged into its default branch, along with its branch. Worktrees are removed one at a time to avoid saturating the disk. Merged branches without a worktree are left alone. Worktrees younger than a day are skipped (they look merged until work starts on them).
+A [worktrunk](https://github.com/max-sixty/worktrunk) [custom subcommand](https://worktrunk.dev/extending/#custom-subcommands) (`wt clean`) that cleans up every repo under `~/repos` at once. It runs `git fetch` in each repo, then removes, one at a time to avoid saturating the disk:
+
+- every clean worktree and every branch merged into its default branch, per `wt step prune`
+- every clean worktree and every branch whose latest GitHub PR is merged or closed, as long as nothing on the branch would be lost: its tip is in the PR, or has the same tree as the PR head. This catches squash merges that `wt step prune` misses, and abandoned PRs.
+
+Worktrees younger than a day are skipped (they look merged until work starts on them). Branches with a closed or merged PR that can't be removed safely (uncommitted changes, commits not in the PR, checked out in the main worktree) are listed under "Kept despite a closed or merged PR" so you can deal with them.
 
 ## Install
 
@@ -9,14 +14,22 @@ brew install kym6464/tap/wt-clean
 brew services start wt-clean  # run now, at login, and daily at 10am
 ```
 
+One-time setup: ignore Finder's `.DS_Store` files globally. Otherwise a `.DS_Store` counts as an uncommitted change and keeps the worktree around.
+
+```sh
+echo .DS_Store >> ~/.config/git/ignore
+```
+
+The GitHub check uses `gh`, so `gh auth login` must have been run.
+
 If the Mac was asleep at 10am, the run happens on wake; if it was off, the login run covers it. Output goes to `$(brew --prefix)/var/log/wt-clean.log`. If anything fails, the run shows one macOS notification (from Script Editor) and exits 1.
 
-To keep a worktree regardless of its merge state, run `git worktree lock <path>`.
+To keep a worktree regardless of its merge or PR state, run `git worktree lock <path>`.
 
 ## Usage
 
 ```sh
-wt clean            # remove merged worktrees
+wt clean            # remove merged and closed-PR worktrees and branches
 wt clean --dry-run  # show what would be removed
 ```
 

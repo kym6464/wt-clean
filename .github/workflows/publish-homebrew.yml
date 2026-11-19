@@ -20,6 +20,7 @@ jobs:
           install: 'bin.install "wt-clean"'
           depends_on: |-
             "worktrunk"
+            "gh"
           target_darwin_arm64: true
           # Runs at login and daily at 10am; launchd runs a missed 10am tick on wake.
           formula_includes: |
