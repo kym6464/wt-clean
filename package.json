@@ -1,6 +1,6 @@
 {
   "name": "wt-clean",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "Worktrunk custom subcommand that removes merged and closed-PR worktrees and branches across all repos",
   "type": "module",
