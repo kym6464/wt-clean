@@ -29,6 +29,10 @@ repo-dirs = ["~/repos", "~/repos_te"]  # directories whose direct children are r
 min-age-hours = 12                     # skip worktrees younger than this; default 24
 ```
 
+## Potential enhancements
+
+- **Sweep orphaned trash.** A background `wt remove` (the default outside this tool) renames the worktree into `<repo>/.git/wt/trash/` and deletes it with a detached `rm -rf`. When that process is killed the worktree stays there at full size, and worktrunk only sweeps trash entries older than 24 hours on the next `wt remove` in the same repo, which may be weeks away. `wt clean` could delete such entries in every repo it visits, one at a time like its other removals.
+
 ## Development
 
 ```sh
